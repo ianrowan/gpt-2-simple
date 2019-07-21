@@ -3,3 +3,5 @@ requests
 tqdm
 numpy
 toposort
+gpt-2-simple
+tensorflow-gpu
