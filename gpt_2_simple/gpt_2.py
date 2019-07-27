@@ -14,11 +14,6 @@ from datetime import datetime
 import csv
 import argparse
 
-# if in Google Colaboratory
-try:
-    from google.colab import drive
-except:
-    pass
 
 from gpt_2_simple.src import model, sample, encoder, memory_saving_gradients
 from gpt_2_simple.src.load_dataset import load_dataset, Sampler
@@ -100,7 +95,7 @@ def start_tf_sess(threads=-1, server=None):
     return tf.Session(config=config)
 
 
-def finetune(sess,
+def train(sess,
              dataset,
              steps=-1,
              model_name='117M',
@@ -119,7 +114,7 @@ def finetune(sess,
              use_memory_saving_gradients=False,
              only_train_transformer_layers=False,
              overwrite=False):
-    """Finetunes the model on the given dataset.
+    """trains the model on the given dataset.
 
     Adapted from https://github.com/nshepperd/gpt-2/blob/finetuning/train.py.
     See that file for parameter definitions.
@@ -197,7 +192,8 @@ def finetune(sess,
         opt_apply = opt.apply_gradients(opt_grads)
         summary_loss = tf.summary.scalar('loss', loss)
 
-    summary_log = tf.summary.FileWriter(checkpoint_path)
+    summary_log = tf.summary.FileWriter(checkpoint_path) if restore_from != 'new' else \
+        tf.summary.FileWriter(os.path.join('models', model_name))
 
     saver = tf.train.Saver(
         var_list=all_vars,
@@ -214,7 +210,10 @@ def finetune(sess,
         ckpt = tf.train.latest_checkpoint(
             os.path.join('models', model_name))
     else:
-        ckpt = tf.train.latest_checkpoint(restore_from)
+        saver.save(sess, os.path.join('models', model_name))
+        ckpt = tf.train.latest_checkpoint(os.path.join('models', model_name))
+        checkpoint_path = os.path.join('models', model_name)
+
     print('Loading checkpoint', ckpt)
     saver.restore(sess, ckpt)
 
@@ -254,6 +253,7 @@ def finetune(sess,
             out = sess.run(
                 tf_sample,
                 feed_dict={context: batch_size * [context_tokens]})
+            print(batch_size * [context_tokens])
             for i in range(min(sample_num - index, batch_size)):
                 text = enc.decode(out[i])
                 text = '======== SAMPLE {} ========\n{}\n'.format(
