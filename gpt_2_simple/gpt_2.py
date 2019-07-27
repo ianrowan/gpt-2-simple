@@ -123,7 +123,7 @@ def train(sess,
     CHECKPOINT_DIR = 'checkpoint'
     SAMPLE_DIR = 'samples'
 
-    checkpoint_path = os.path.join(CHECKPOINT_DIR, run_name)
+    checkpoint_path = os.path.join(CHECKPOINT_DIR, run_name) if restore_from != 'new' else os.path.join('models', model_name)
 
     def maketree(path):
         try:
@@ -210,9 +210,9 @@ def train(sess,
         ckpt = tf.train.latest_checkpoint(
             os.path.join('models', model_name))
     else:
-        saver.save(sess, os.path.join('models', model_name))
+        saver.save(sess, os.path.join('models', model_name) + "/{}.ckpt".format(model_name))
         ckpt = tf.train.latest_checkpoint(os.path.join('models', model_name))
-        checkpoint_path = os.path.join('models', model_name)
+        
 
     print('Loading checkpoint', ckpt)
     saver.restore(sess, ckpt)
