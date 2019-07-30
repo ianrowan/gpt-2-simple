@@ -145,7 +145,7 @@ def positions_for(tokens, past_length):
 
 
 def model(hparams, X, past=None, scope='model', reuse=False):
-    print(hparams)
+    #print(hparams)
     with tf.variable_scope(scope, reuse=reuse):
         results = {}
         batch, sequence = shape_list(X)

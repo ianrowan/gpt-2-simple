@@ -415,6 +415,7 @@ def generate(sess,
             out = sess.run(output, feed_dict={
                     context: batch_size * [context_tokens]
                 })
+        #print(batch_size * [context_tokens])
         for i in range(batch_size):
             generated += 1
             gen_text = enc.decode(out[i])
@@ -436,7 +437,8 @@ def generate(sess,
             if destination_path:
                 f.write("{}\n{}".format(gen_text, sample_delim))
             if not return_as_list and not destination_path:
-                print("{}\n{}".format(gen_text, sample_delim), end='')
+                print("Satoshi Says....\n")
+                print("{}{}".format(gen_text, sample_delim), end='...')
             gen_texts.append(gen_text)
 
     if destination_path:
